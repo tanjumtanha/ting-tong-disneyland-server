@@ -32,10 +32,19 @@ async function run() {
 
         //   get all the data from database
         app.get("/allToys", async (req, res) => {
-            const result = await toysCollection.find({}).limit(20).toArray();
+            const { search } = req.query;
+            let query = {};
+
+            if (search) {
+                query = { name: { $regex: search, $options: "i" } };
+            }
+
+            const result = await toysCollection.find(query).limit(20).toArray();
             res.send(result);
-          });
-          
+        });
+
+
+
 
         // get single toys
         app.get("/details/:id", async (req, res) => {
@@ -71,27 +80,27 @@ async function run() {
         app.get("/myToys/:email", async (req, res) => {
             const { email } = req.params;
             const { sort } = req.query;
-          
+
             let sortOption = {};
             if (sort === "asc") {
-              sortOption = { price: 1 };
+                sortOption = { price: 1 };
             } else if (sort === "desc") {
-              sortOption = { price: -1 };
+                sortOption = { price: -1 };
             }
-          
+
             try {
-              const toys = await toysCollection
-                .find({ sellerEmail: email })
-                .sort(sortOption)
-                .toArray();
-          
-              res.send(toys);
+                const toys = await toysCollection
+                    .find({ sellerEmail: email })
+                    .sort(sortOption)
+                    .toArray();
+
+                res.send(toys);
             } catch (error) {
-              console.error("Error fetching toys:", error);
-              res.status(500).send("An error occurred while fetching toys.");
+                console.error("Error fetching toys:", error);
+                res.status(500).send("An error occurred while fetching toys.");
             }
-          });
-          
+        });
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
