@@ -39,8 +39,8 @@ async function run() {
         // get single toys
         app.get("/details/:id", async (req, res) => {
             console.log(req.params.id);
-            const jobs = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
-            res.send(jobs);
+            const toys = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
+            res.send(toys);
         });
 
         // add data to database
@@ -61,9 +61,15 @@ async function run() {
         // get category wise data
         app.get("/allToys/:category", async (req, res) => {
             //console.log(req.params.id);
-            const jobs = await toysCollection.find({ category: req.params.category, }).toArray();
-            res.send(jobs);
+            const toys = await toysCollection.find({ category: req.params.category, }).toArray();
+            res.send(toys);
         });
+
+        app.get("/myToys/:email", async (req, res) => {
+            console.log(req.params.email);
+            const toys = await toysCollection.find({sellerEmail: req.params.email}).toArray();
+            res.send(toys);
+          });
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
