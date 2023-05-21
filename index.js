@@ -32,9 +32,10 @@ async function run() {
 
         //   get all the data from database
         app.get("/allToys", async (req, res) => {
-            const result = await toysCollection.find({}).toArray();
-            res.send(result)
-        })
+            const result = await toysCollection.find({}).limit(20).toArray();
+            res.send(result);
+          });
+          
 
         // get single toys
         app.get("/details/:id", async (req, res) => {
@@ -65,11 +66,32 @@ async function run() {
             res.send(toys);
         });
 
+        // my toys 
+
         app.get("/myToys/:email", async (req, res) => {
-            console.log(req.params.email);
-            const toys = await toysCollection.find({ sellerEmail: req.params.email }).sort({ _id: -1 }).toArray();
-            res.send(toys);
+            const { email } = req.params;
+            const { sort } = req.query;
+          
+            let sortOption = {};
+            if (sort === "asc") {
+              sortOption = { price: 1 };
+            } else if (sort === "desc") {
+              sortOption = { price: -1 };
+            }
+          
+            try {
+              const toys = await toysCollection
+                .find({ sellerEmail: email })
+                .sort(sortOption)
+                .toArray();
+          
+              res.send(toys);
+            } catch (error) {
+              console.error("Error fetching toys:", error);
+              res.status(500).send("An error occurred while fetching toys.");
+            }
           });
+          
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
