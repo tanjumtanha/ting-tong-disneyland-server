@@ -28,8 +28,6 @@ async function run() {
 
         const toysCollection = client.db('tingTong').collection('toys')
 
-        // add data to database
-
         //   get all the data from database
         app.get("/allToys", async (req, res) => {
             const { search } = req.query;
@@ -100,6 +98,23 @@ async function run() {
                 res.status(500).send("An error occurred while fetching toys.");
             }
         });
+
+        // update toys data
+        app.put("/updateToys/:id", async (req, res) => {
+            const id = req.params.id;
+            const body = req.body;
+            console.log(body);
+            const filter = { _id: new ObjectId(id) };
+            const updatedData = {
+                $set: {
+                    price: body.price,
+                    quantity: body.quantity,
+                    description: body.description,
+                },
+            };
+            const result = await toysCollection.updateOne(filter, updatedData);
+            res.send(result);
+        })
 
 
         // Send a ping to confirm a successful connection
