@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
@@ -29,6 +29,21 @@ async function run() {
         const toysCollection = client.db('tingTong').collection('toys')
 
         // add data to database
+
+        //   get all the data from database
+        app.get("/allToys", async (req, res) => {
+            const result = await toysCollection.find({}).toArray();
+            res.send(result)
+        })
+
+        // get single toys
+        app.get("/details/:id", async (req, res) => {
+            console.log(req.params.id);
+            const jobs = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
+            res.send(jobs);
+        });
+
+        // add data to database
         app.post("/addToys", async (req, res) => {
             const body = req.body;
             console.log(body);
@@ -43,18 +58,12 @@ async function run() {
             }
         });
 
-        //   get all the data from database
-        app.get("/allToys", async (req, res) => {
-            const result = await toysCollection.find({}).toArray();
-            res.send(result)
-        })
-
         // get category wise data
         app.get("/allToys/:category", async (req, res) => {
             //console.log(req.params.id);
-            const jobs = await toysCollection.find({category: req.params.category,}).toArray();
+            const jobs = await toysCollection.find({ category: req.params.category, }).toArray();
             res.send(jobs);
-          });
+        });
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
