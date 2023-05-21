@@ -46,7 +46,7 @@ async function run() {
 
         // get single toys
         app.get("/details/:id", async (req, res) => {
-            console.log(req.params.id);
+           // console.log(req.params.id);
             const toys = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
             res.send(toys);
         });
@@ -54,7 +54,7 @@ async function run() {
         // add data to database
         app.post("/addToys", async (req, res) => {
             const body = req.body;
-            console.log(body);
+           // console.log(body);
             const result = await toysCollection.insertOne(body);
             if (result?.insertedId) {
                 return res.status(200).send(result);
@@ -103,7 +103,7 @@ async function run() {
         app.put("/updateToys/:id", async (req, res) => {
             const id = req.params.id;
             const body = req.body;
-            console.log(body);
+            //console.log(body);
             const filter = { _id: new ObjectId(id) };
             const updatedData = {
                 $set: {
@@ -115,6 +115,15 @@ async function run() {
             const result = await toysCollection.updateOne(filter, updatedData);
             res.send(result);
         })
+
+        // delete from database
+        app.delete('/deleteToy/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await toysCollection.deleteOne(query);
+            res.send(result);
+        });
+
 
 
         // Send a ping to confirm a successful connection
